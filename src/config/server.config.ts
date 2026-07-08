@@ -1,6 +1,10 @@
 import { registerAs } from '@nestjs/config';
+import { getValidatedEnv } from './env.validation';
 
-export default registerAs('server', () => ({
-  nodeEnv: process.env.NODE_ENV || 'development',
-  port: Number(process.env.PORT) || 3000,
-}));
+export default registerAs('server', () => {
+  const env = getValidatedEnv();
+  return {
+    nodeEnv: env.NODE_ENV,
+    port: env.PORT,
+  };
+});

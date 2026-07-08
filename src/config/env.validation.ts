@@ -62,3 +62,12 @@ export function validate(config: Record<string, unknown>) {
   }
   return validatedConfig;
 }
+
+let cachedEnv: EnvironmentVariables | undefined;
+
+export function getValidatedEnv(): EnvironmentVariables {
+  if (!cachedEnv) {
+    cachedEnv = validate(process.env);
+  }
+  return cachedEnv;
+}
