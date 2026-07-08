@@ -47,6 +47,46 @@ export class EnvironmentVariables {
   @Min(0)
   @Max(15)
   REDIS_DB?: number;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_USER_ACCESS_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_USER_ACCESS_EXPIRES_IN: string = '15m';
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_USER_REFRESH_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_USER_REFRESH_EXPIRES_IN: string = '7d';
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_ADMIN_ACCESS_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_ADMIN_ACCESS_EXPIRES_IN: string = '15m';
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_ADMIN_REFRESH_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_ADMIN_REFRESH_EXPIRES_IN: string = '7d';
+
+  @IsString()
+  @IsNotEmpty()
+  ADMIN_SEED_USERNAME!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ADMIN_SEED_PASSWORD!: string;
 }
 
 export function validate(config: Record<string, unknown>) {
