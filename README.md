@@ -1,98 +1,117 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Quản lý rau củ — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API backend cho hệ thống quản lý rau củ, xây dựng bằng [NestJS 11](https://nestjs.com/) + [Prisma 7](https://www.prisma.io/) + PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Công nghệ
 
-## Description
+- **NestJS 11** — framework Node.js
+- **Prisma 7** — ORM (driver adapter `@prisma/adapter-pg`, client sinh vào `src/generated/prisma`)
+- **PostgreSQL 16** — cơ sở dữ liệu
+- **Redis 7** — cache/session store, tích hợp qua `ioredis` (`RedisModule`/`RedisService`)
+- **Swagger** — tài liệu API tại `/api/docs`
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Yêu cầu
 
-## Project setup
+- Node.js >= 22
+- Docker + Docker Compose
+
+## Cài đặt
 
 ```bash
-$ npm install
+npm install
+cp .env.example .env   # chỉnh sửa nếu cần
+npm run prisma:generate
 ```
 
-## Compile and run the project
+## Chạy dự án
+
+### Chế độ hybrid (khuyến nghị khi dev) — infra chạy Docker, BE chạy local
 
 ```bash
-# development
-$ npm run start
+# 1. Bật PostgreSQL + Redis
+docker compose -f docker-compose.infra.yml up -d
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# 2. Chạy BE ở chế độ watch
+npm run start:dev
 ```
 
-## Run tests
+### Chế độ fullmode — toàn bộ chạy Docker
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker compose up --build
 ```
 
-## Deployment
+Sau khi chạy:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- API: http://localhost:3000/api/v1
+- Swagger docs: http://localhost:3000/api/docs
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Prisma
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run prisma:generate   # sinh lại client sau khi sửa schema
+npm run prisma:migrate    # tạo + chạy migration (dev)
+npm run prisma:deploy     # chạy migration (production)
+npm run prisma:studio     # GUI xem dữ liệu
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Schema: [prisma/schema.prisma](prisma/schema.prisma)
+- Cấu hình CLI (connection URL, đường dẫn migration): [prisma.config.ts](prisma.config.ts)
+- Client được sinh vào `src/generated/prisma` (đã gitignore — chạy `prisma:generate` sau khi clone)
 
-## Resources
+## Test & chất lượng code
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+npm run lint       # eslint --fix
+npm run format     # prettier
+npm test           # unit tests
+npm run test:e2e   # e2e tests
+npm run test:cov   # coverage
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **Husky + lint-staged**: tự động lint/format các file staged trước mỗi commit.
+- **Husky + commitlint**: commit message phải theo [Conventional Commits](https://www.conventionalcommits.org/) (vd `feat: ...`, `fix: ...`), kiểm tra ở hook `commit-msg` ([commitlint.config.js](commitlint.config.js)).
+- **GitHub Actions**: lint → build → test trên mỗi push/PR vào `main` ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
 
-## Support
+## Response format & bảo mật
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- **Response envelope**: mọi response đi qua `ResponseInterceptor` và `HttpExceptionFilter` ([src/common](src/common)), áp dụng toàn cục qua `APP_INTERCEPTOR`/`APP_FILTER` trong [app.module.ts](src/app.module.ts).
+  - Thành công: `{ "success": true, "data": ... }`
+  - Lỗi: `{ "success": false, "error": { "statusCode", "message", "error", "timestamp", "path" } }`
+- **Bảo mật cơ bản**: [helmet](https://www.npmjs.com/package/helmet) set security headers; rate limit toàn cục 100 request/60s theo IP qua `@nestjs/throttler` (endpoint `/health` được `@SkipThrottle()` vì bị Docker/monitoring poll thường xuyên).
 
-## Stay in touch
+## Cấu trúc thư mục
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```
+src/
+├── common/
+│   ├── filters/             # HttpExceptionFilter (chuẩn hoá response lỗi)
+│   └── interceptors/        # ResponseInterceptor (bọc response thành công)
+├── config/                  # cấu hình + validate biến môi trường (env.validation.ts)
+├── generated/prisma/        # Prisma client (tự sinh, không commit)
+├── modules/shared/
+│   ├── database/            # PrismaModule + PrismaService (global)
+│   ├── redis/               # RedisModule + RedisService (global, dùng ioredis)
+│   └── health/              # HealthModule: GET /api/v1/health (kiểm tra DB + Redis)
+├── app.controller.ts        # GET /api/v1: thông tin API (tên, version, mô tả)
+├── app.module.ts
+├── app.service.ts
+└── main.ts                  # bootstrap: prefix /api/v1, helmet, Swagger, ValidationPipe, CORS
+```
 
-## License
+## Biến môi trường
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Biến                | Mô tả                                                       | Mặc định          |
+| ------------------- | ----------------------------------------------------------- | ----------------- |
+| `NODE_ENV`          | `development/production/test`                               | `development`     |
+| `PORT`              | Cổng HTTP                                                   | `3000`            |
+| `DATABASE_URL`      | Connection string PostgreSQL                                | —                 |
+| `POSTGRES_USER`     | Chỉ dùng khi khởi tạo container postgres qua docker-compose | `postgres`        |
+| `POSTGRES_PASSWORD` | Chỉ dùng khi khởi tạo container postgres qua docker-compose | `postgres`        |
+| `POSTGRES_DB`       | Chỉ dùng khi khởi tạo container postgres qua docker-compose | `quan_ly_rau_cai` |
+| `REDIS_HOST`        | Redis host                                                  | `localhost`       |
+| `REDIS_PORT`        | Redis port                                                  | `6379`            |
+| `REDIS_PASSWORD`    | Redis password (tùy chọn)                                   | —                 |
+| `REDIS_DB`          | Redis DB index (tùy chọn)                                   | —                 |
+
+Biến môi trường được validate lúc khởi động ([src/config/env.validation.ts](src/config/env.validation.ts)) — app sẽ báo lỗi ngay nếu thiếu/sai.

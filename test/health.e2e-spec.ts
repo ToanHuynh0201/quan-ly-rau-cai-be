@@ -4,35 +4,35 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from './../src/modules/shared/database';
+import { RedisService } from './../src/modules/shared/redis';
 
-describe('AppController (e2e)', () => {
+describe('HealthController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      // Stub PrismaService để e2e không cần database thật
+      // Stub Prisma/Redis để e2e không cần database/redis thật
       .overrideProvider(PrismaService)
-      .useValue({})
+      .useValue({ $runCommandRaw: jest.fn().mockResolvedValue({ ok: 1 }) })
+      .overrideProvider(RedisService)
+      .useValue({
+        client: { status: 'ready', ping: jest.fn().mockResolvedValue('PONG') },
+      })
       .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('/health (GET)', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .get('/health')
       .expect(200)
       .expect((res) => {
         expect(res.body).toMatchObject({
-          success: true,
-          data: {
-            name: 'Quản lý rau củ API',
-            version: '1.0',
-            description: 'API backend cho hệ thống quản lý rau củ',
-          },
+          status: 'ok',
         });
       });
   });

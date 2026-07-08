@@ -14,9 +14,14 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getInfo', () => {
+    it('should return app info', () => {
+      const result = appController.getInfo();
+      expect(result).toEqual({
+        name: 'Quản lý rau củ API',
+        version: '1.0',
+        description: 'API backend cho hệ thống quản lý rau củ',
+      });
     });
   });
 });
