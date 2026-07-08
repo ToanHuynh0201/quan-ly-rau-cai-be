@@ -1,5 +1,5 @@
-# HYBRID: chỉ chạy infrastructure (PostgreSQL + Redis) trong Docker,
-# BE chạy local bằng `npm run start:dev`.
+# HYBRID: only runs the infrastructure (PostgreSQL + Redis) in Docker,
+# the backend runs locally via `npm run start:dev`.
 #   docker compose -f docker-compose.infra.yml up -d
 
 services:

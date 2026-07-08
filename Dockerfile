@@ -4,7 +4,7 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-# --ignore-scripts: tránh chạy `prepare: husky` (không có .git/.husky trong build context)
+# --ignore-scripts: avoid running `prepare: husky` (no .git/.husky in the build context)
 RUN npm ci --ignore-scripts
 
 COPY prisma.config.ts ./
@@ -21,7 +21,7 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-# --ignore-scripts: tránh chạy `prepare: husky` (husky là devDependency)
+# --ignore-scripts: avoid running `prepare: husky` (husky is a devDependency)
 COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 

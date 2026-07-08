@@ -3,7 +3,7 @@
 /node_modules
 /build
 
-# Prisma generated client (chạy `npm run prisma:generate` để tạo lại)
+# Prisma generated client (run `npm run prisma:generate` to regenerate)
 /src/generated
 
 # Logs

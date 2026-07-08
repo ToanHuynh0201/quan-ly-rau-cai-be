@@ -12,7 +12,7 @@ describe('AppController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      // Stub PrismaService để e2e không cần database thật
+      // Stub PrismaService so e2e tests don't need a real database
       .overrideProvider(PrismaService)
       .useValue({})
       .compile();
@@ -29,9 +29,9 @@ describe('AppController (e2e)', () => {
         expect(res.body).toMatchObject({
           success: true,
           data: {
-            name: 'Quản lý rau củ API',
+            name: 'Vegetable Management API',
             version: '1.0',
-            description: 'API backend cho hệ thống quản lý rau củ',
+            description: 'Backend API for the vegetable management system',
           },
         });
       });

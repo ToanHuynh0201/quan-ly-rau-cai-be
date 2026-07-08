@@ -1,7 +1,7 @@
-# FULLMODE: chạy toàn bộ hệ thống (BE + PostgreSQL + Redis) trong Docker.
+# FULL MODE: runs the entire system (backend + PostgreSQL + Redis) in Docker.
 #   docker compose up --build
 #
-# Nếu chỉ muốn chạy infrastructure (BE chạy local), dùng:
+# If you only want to run the infrastructure (backend runs locally), use:
 #   docker compose -f docker-compose.infra.yml up -d
 
 include:

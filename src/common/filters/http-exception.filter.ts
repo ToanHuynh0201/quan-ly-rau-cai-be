@@ -71,19 +71,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
           );
           statusCode = HttpStatus.CONFLICT;
           message = target
-            ? `Dữ liệu đã tồn tại (trùng ${target})`
-            : 'Dữ liệu đã tồn tại';
+            ? `Data already exists (duplicate ${target})`
+            : 'Data already exists';
           error = 'Conflict';
           break;
         }
         case 'P2025':
           statusCode = HttpStatus.NOT_FOUND;
-          message = 'Không tìm thấy bản ghi';
+          message = 'Record not found';
           error = 'Not Found';
           break;
         default:
           statusCode = HttpStatus.BAD_REQUEST;
-          message = 'Lỗi dữ liệu';
+          message = 'Data error';
           error = 'Bad Request';
       }
     }

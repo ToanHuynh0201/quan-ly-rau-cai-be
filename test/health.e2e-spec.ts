@@ -13,7 +13,7 @@ describe('HealthController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      // Stub Prisma/Redis để e2e không cần database/redis thật
+      // Stub Prisma/Redis so e2e tests don't need a real database/redis
       .overrideProvider(PrismaService)
       .useValue({ $runCommandRaw: jest.fn().mockResolvedValue({ ok: 1 }) })
       .overrideProvider(RedisService)

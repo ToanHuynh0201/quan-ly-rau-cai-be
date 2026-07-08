@@ -24,8 +24,8 @@ async function bootstrap() {
   );
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Quản lý rau củ API')
-    .setDescription('API backend cho hệ thống quản lý rau củ')
+    .setTitle('Vegetable Management API')
+    .setDescription('Backend API for the vegetable management system')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);

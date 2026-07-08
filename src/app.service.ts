@@ -10,9 +10,9 @@ export interface AppInfo {
 export class AppService {
   getInfo(): AppInfo {
     return {
-      name: 'Quản lý rau củ API',
+      name: 'Vegetable Management API',
       version: '1.0',
-      description: 'API backend cho hệ thống quản lý rau củ',
+      description: 'Backend API for the vegetable management system',
     };
   }
 }

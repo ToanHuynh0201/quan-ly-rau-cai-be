@@ -14,8 +14,8 @@ export class RedisHealthIndicator {
     const indicator = this.healthIndicatorService.check(key);
     const { status } = this.redisService.client;
 
-    // Khi mất kết nối, ioredis xếp hàng lệnh chờ reconnect — ping() sẽ treo
-    // thay vì fail, nên phải kiểm tra status trước.
+    // When disconnected, ioredis queues commands waiting to reconnect — ping()
+    // would hang instead of failing, so status must be checked first.
     if (status !== 'ready') {
       return indicator.down({
         message: `Redis client is not ready (${status})`,

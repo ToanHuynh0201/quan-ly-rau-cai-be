@@ -27,7 +27,7 @@ export class RedisService implements OnModuleDestroy {
     });
   }
 
-  /** Raw ioredis client cho các lệnh nâng cao (pipeline, pub/sub, BullMQ...). */
+  /** Raw ioredis client for advanced commands (pipeline, pub/sub, BullMQ...). */
   get client(): Redis {
     return this.redisClient;
   }

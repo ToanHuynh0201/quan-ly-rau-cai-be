@@ -7,8 +7,8 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    // Không dùng env() của Prisma vì nó throw khi biến chưa được set,
-    // làm hỏng `prisma generate` ở CI/Docker (nơi không có .env).
+    // Not using Prisma's env() because it throws when the variable isn't set,
+    // which breaks `prisma generate` in CI/Docker (where there's no .env).
     url: process.env.DATABASE_URL,
   },
 });

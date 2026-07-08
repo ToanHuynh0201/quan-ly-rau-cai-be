@@ -9,8 +9,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Thông tin API' })
-  @ApiOkResponse({ description: 'Thông tin chung về API' })
+  @ApiOperation({ summary: 'API information' })
+  @ApiOkResponse({ description: 'General API information' })
   getInfo(): AppInfo {
     return this.appService.getInfo();
   }
