@@ -1,98 +1,117 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Vegetable Management — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API for the vegetable management system, built with [NestJS 11](https://nestjs.com/) + [Prisma 7](https://www.prisma.io/) + PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tech stack
 
-## Description
+- **NestJS 11** — Node.js framework
+- **Prisma 7** — ORM (driver adapter `@prisma/adapter-pg`, client generated into `src/generated/prisma`)
+- **PostgreSQL 16** — database
+- **Redis 7** — cache/session store, integrated via `ioredis` (`RedisModule`/`RedisService`)
+- **Swagger** — API docs at `/api/docs`
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Requirements
 
-## Project setup
+- Node.js >= 22
+- Docker + Docker Compose
+
+## Setup
 
 ```bash
-$ npm install
+npm install
+cp .env.example .env   # edit if needed
+npm run prisma:generate
 ```
 
-## Compile and run the project
+## Running the project
+
+### Hybrid mode (recommended for dev) — infra runs in Docker, backend runs locally
 
 ```bash
-# development
-$ npm run start
+# 1. Start PostgreSQL + Redis
+docker compose -f docker-compose.infra.yml up -d
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# 2. Run the backend in watch mode
+npm run start:dev
 ```
 
-## Run tests
+### Full mode — everything runs in Docker
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker compose up --build
 ```
 
-## Deployment
+Once running:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- API: http://localhost:3000/api/v1
+- Swagger docs: http://localhost:3000/api/docs
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Prisma
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run prisma:generate   # regenerate the client after editing the schema
+npm run prisma:migrate    # create + run a migration (dev)
+npm run prisma:deploy     # run migrations (production)
+npm run prisma:studio     # GUI to browse data
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Schema: [prisma/schema.prisma](prisma/schema.prisma)
+- CLI config (connection URL, migration path): [prisma.config.ts](prisma.config.ts)
+- The client is generated into `src/generated/prisma` (gitignored — run `prisma:generate` after cloning)
 
-## Resources
+## Tests & code quality
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+npm run lint       # eslint --fix
+npm run format     # prettier
+npm test           # unit tests
+npm run test:e2e   # e2e tests
+npm run test:cov   # coverage
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **Husky + lint-staged**: automatically lints/formats staged files before every commit.
+- **Husky + commitlint**: commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat: ...`, `fix: ...`), checked in the `commit-msg` hook ([commitlint.config.js](commitlint.config.js)).
+- **GitHub Actions**: lint → build → test on every push/PR to `main` ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
 
-## Support
+## Response format & security
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- **Response envelope**: every response goes through `ResponseInterceptor` and `HttpExceptionFilter` ([src/common](src/common)), applied globally via `APP_INTERCEPTOR`/`APP_FILTER` in [app.module.ts](src/app.module.ts).
+  - Success: `{ "success": true, "data": ... }`
+  - Error: `{ "success": false, "error": { "statusCode", "message", "error", "timestamp", "path" } }`
+- **Basic security**: [helmet](https://www.npmjs.com/package/helmet) sets security headers; a global rate limit of 100 requests/60s per IP via `@nestjs/throttler` (the `/health` endpoint is `@SkipThrottle()` since it's polled frequently by Docker/monitoring).
 
-## Stay in touch
+## Directory structure
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```
+src/
+├── common/
+│   ├── filters/             # HttpExceptionFilter (normalizes error responses)
+│   └── interceptors/        # ResponseInterceptor (wraps successful responses)
+├── config/                  # config + environment variable validation (env.validation.ts)
+├── generated/prisma/        # Prisma client (auto-generated, not committed)
+├── modules/shared/
+│   ├── database/            # PrismaModule + PrismaService (global)
+│   ├── redis/               # RedisModule + RedisService (global, uses ioredis)
+│   └── health/               # HealthModule: GET /api/v1/health (checks DB + Redis)
+├── app.controller.ts        # GET /api/v1: API info (name, version, description)
+├── app.module.ts
+├── app.service.ts
+└── main.ts                  # bootstrap: /api/v1 prefix, helmet, Swagger, ValidationPipe, CORS
+```
 
-## License
+## Environment variables
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Variable            | Description                                                 | Default           |
+| ------------------- | ----------------------------------------------------------- | ----------------- |
+| `NODE_ENV`          | `development/production/test`                               | `development`     |
+| `PORT`              | HTTP port                                                   | `3000`            |
+| `DATABASE_URL`      | PostgreSQL connection string                                | —                 |
+| `POSTGRES_USER`     | Only used to init the postgres container via docker-compose | `postgres`        |
+| `POSTGRES_PASSWORD` | Only used to init the postgres container via docker-compose | `postgres`        |
+| `POSTGRES_DB`       | Only used to init the postgres container via docker-compose | `quan_ly_rau_cai` |
+| `REDIS_HOST`        | Redis host                                                  | `localhost`       |
+| `REDIS_PORT`        | Redis port                                                  | `6379`            |
+| `REDIS_PASSWORD`    | Redis password (optional)                                   | —                 |
+| `REDIS_DB`          | Redis DB index (optional)                                   | —                 |
+
+Environment variables are validated at startup ([src/config/env.validation.ts](src/config/env.validation.ts)) — the app will fail fast if any are missing or invalid.
