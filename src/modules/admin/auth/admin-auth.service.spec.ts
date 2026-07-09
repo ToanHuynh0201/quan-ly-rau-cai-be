@@ -152,7 +152,7 @@ describe('AdminAuthService', () => {
         refreshToken: 'new-refresh-token',
       });
 
-      await service.refresh(refreshToken);
+      await service.refresh({ refreshToken });
 
       expect(tokenService.verifyAndConsumeRefreshToken).toHaveBeenCalledWith(
         refreshToken,
@@ -166,7 +166,7 @@ describe('AdminAuthService', () => {
       });
       usersService.findById.mockResolvedValue(null);
 
-      await expect(service.refresh(refreshToken)).rejects.toThrow(
+      await expect(service.refresh({ refreshToken })).rejects.toThrow(
         new UnauthorizedException(INVALID_REFRESH_TOKEN_MESSAGE),
       );
       expect(tokenService.revokeAllSessions).toHaveBeenCalledWith(
@@ -181,7 +181,7 @@ describe('AdminAuthService', () => {
       });
       usersService.findById.mockResolvedValue(buildUser({ isActive: false }));
 
-      await expect(service.refresh(refreshToken)).rejects.toThrow(
+      await expect(service.refresh({ refreshToken })).rejects.toThrow(
         new UnauthorizedException(INVALID_REFRESH_TOKEN_MESSAGE),
       );
       expect(tokenService.revokeAllSessions).toHaveBeenCalledWith(
@@ -196,7 +196,7 @@ describe('AdminAuthService', () => {
       });
       usersService.findById.mockResolvedValue(buildUser({ role: Role.USER }));
 
-      await expect(service.refresh(refreshToken)).rejects.toThrow(
+      await expect(service.refresh({ refreshToken })).rejects.toThrow(
         new UnauthorizedException(INVALID_REFRESH_TOKEN_MESSAGE),
       );
       expect(tokenService.revokeAllSessions).toHaveBeenCalledWith(
@@ -216,7 +216,7 @@ describe('AdminAuthService', () => {
         refreshToken: 'new-refresh-token',
       });
 
-      const result = await service.refresh(refreshToken);
+      const result = await service.refresh({ refreshToken });
 
       expect(tokenService.issueTokenPair).toHaveBeenCalledWith({
         sub: admin.id,
@@ -233,7 +233,7 @@ describe('AdminAuthService', () => {
 
   describe('logout', () => {
     it('revokes the session scoped to Role.ADMIN', async () => {
-      await service.logout('refresh-token');
+      await service.logout({ refreshToken: 'refresh-token' });
 
       expect(tokenService.revokeSession).toHaveBeenCalledWith(
         'refresh-token',
