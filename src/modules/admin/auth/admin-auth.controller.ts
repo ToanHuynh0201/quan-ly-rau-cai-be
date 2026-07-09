@@ -25,13 +25,13 @@ export class AdminAuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   refresh(@Body() dto: RefreshTokenDto) {
-    return this.authService.refresh(dto.refreshToken);
+    return this.authService.refresh(dto);
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AdminJwtAuthGuard)
   logout(@Body() dto: LogoutDto) {
-    return this.authService.logout(dto.refreshToken);
+    return this.authService.logout(dto);
   }
 }
