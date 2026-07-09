@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
   validateSync,
@@ -54,6 +55,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
   JWT_USER_ACCESS_EXPIRES_IN: string = '15m';
 
   @IsString()
@@ -62,6 +64,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
   JWT_USER_REFRESH_EXPIRES_IN: string = '7d';
 
   @IsString()
@@ -70,6 +73,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
   JWT_ADMIN_ACCESS_EXPIRES_IN: string = '15m';
 
   @IsString()
@@ -78,6 +82,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
   JWT_ADMIN_REFRESH_EXPIRES_IN: string = '7d';
 
   @IsString()
