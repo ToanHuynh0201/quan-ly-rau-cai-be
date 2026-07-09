@@ -8,6 +8,8 @@ import {
   INVALID_REFRESH_TOKEN_MESSAGE,
 } from './constants';
 import type { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { LogoutDto } from './dto/logout.dto';
 
 @Injectable()
 export class AdminAuthService {
@@ -23,6 +25,7 @@ export class AdminAuthService {
     }
 
     const passwordMatches = await bcrypt.compare(dto.password, user.password);
+
     if (!passwordMatches) {
       throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
     }
@@ -34,11 +37,12 @@ export class AdminAuthService {
     });
   }
 
-  async refresh(refreshToken: string): Promise<TokenPair> {
+  async refresh(dto: RefreshTokenDto): Promise<TokenPair> {
     const { sub } = await this.tokenService.verifyAndConsumeRefreshToken(
-      refreshToken,
+      dto.refreshToken,
       Role.ADMIN,
     );
+
     const user = await this.usersService.findById(sub);
     if (!user || !user.isActive || user.role !== Role.ADMIN) {
       await this.tokenService.revokeAllSessions(sub, Role.ADMIN);
@@ -52,11 +56,7 @@ export class AdminAuthService {
     });
   }
 
-  async logout(refreshToken: string): Promise<void> {
-    await this.tokenService.revokeSession(refreshToken, Role.ADMIN);
-  }
-
-  async logoutAll(userId: string): Promise<void> {
-    await this.tokenService.revokeAllSessions(userId, Role.ADMIN);
+  async logout(dto: LogoutDto): Promise<void> {
+    await this.tokenService.revokeSession(dto.refreshToken, Role.ADMIN);
   }
 }

@@ -241,15 +241,4 @@ describe('AdminAuthService', () => {
       );
     });
   });
-
-  describe('logoutAll', () => {
-    it('revokes all sessions scoped to Role.ADMIN', async () => {
-      await service.logoutAll('admin-1');
-
-      expect(tokenService.revokeAllSessions).toHaveBeenCalledWith(
-        'admin-1',
-        Role.ADMIN,
-      );
-    });
-  });
 });

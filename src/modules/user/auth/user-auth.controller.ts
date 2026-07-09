@@ -6,15 +6,20 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { AdminAuthService } from './admin-auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { AdminJwtAuthGuard } from './guards/admin-jwt-auth.guard';
-import { LogoutDto } from './dto/logout.dto';
+import { RegisterDto } from './dto/register.dto';
+import { UserJwtAuthGuard } from './guards/user-jwt-auth.guard';
+import { UserAuthService } from './user-auth.service';
 
-@Controller('admin/auth')
-export class AdminAuthController {
-  constructor(private readonly authService: AdminAuthService) {}
+@Controller('auth')
+export class UserAuthController {
+  constructor(private readonly authService: UserAuthService) {}
+
+  @Post('register')
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -30,8 +35,8 @@ export class AdminAuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(AdminJwtAuthGuard)
-  logout(@Body() dto: LogoutDto) {
+  @UseGuards(UserJwtAuthGuard)
+  logout(@Body() dto: RefreshTokenDto) {
     return this.authService.logout(dto.refreshToken);
   }
 }
