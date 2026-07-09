@@ -43,3 +43,9 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/quan_ly_rau_cai?schema=public
           REDIS_HOST: localhost
           REDIS_PORT: 6379
+          JWT_USER_ACCESS_SECRET: test-user-access-secret
+          JWT_USER_REFRESH_SECRET: test-user-refresh-secret
+          JWT_ADMIN_ACCESS_SECRET: test-admin-access-secret
+          JWT_ADMIN_REFRESH_SECRET: test-admin-refresh-secret
+          ADMIN_SEED_USERNAME: admin
+          ADMIN_SEED_PASSWORD: Admin@12345
