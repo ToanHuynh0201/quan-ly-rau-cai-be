@@ -51,39 +51,21 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  JWT_USER_ACCESS_SECRET!: string;
+  JWT_ACCESS_SECRET!: string;
 
   @IsString()
   @IsNotEmpty()
   @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
-  JWT_USER_ACCESS_EXPIRES_IN: string = '15m';
+  JWT_ACCESS_EXPIRES_IN: string = '15m';
 
   @IsString()
   @IsNotEmpty()
-  JWT_USER_REFRESH_SECRET!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
-  JWT_USER_REFRESH_EXPIRES_IN: string = '7d';
-
-  @IsString()
-  @IsNotEmpty()
-  JWT_ADMIN_ACCESS_SECRET!: string;
+  JWT_REFRESH_SECRET!: string;
 
   @IsString()
   @IsNotEmpty()
   @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
-  JWT_ADMIN_ACCESS_EXPIRES_IN: string = '15m';
-
-  @IsString()
-  @IsNotEmpty()
-  JWT_ADMIN_REFRESH_SECRET!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
-  JWT_ADMIN_REFRESH_EXPIRES_IN: string = '7d';
+  JWT_REFRESH_EXPIRES_IN: string = '7d';
 
   @IsString()
   @IsNotEmpty()
