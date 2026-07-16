@@ -2,7 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createHash } from 'crypto';
-import { jwtAdminConfig, jwtUserConfig } from '../../../config';
+import { jwtConfig } from '../../../config';
 import { Role } from '../../../generated/prisma/client';
 import { RedisService } from '../redis';
 import {
@@ -13,18 +13,11 @@ import {
 } from './constants';
 import { TokenService } from './token.service';
 
-const userConfig = {
-  accessSecret: 'user-access-secret',
+const config = {
+  accessSecret: 'access-secret',
   accessExpiresIn: '15m',
-  refreshSecret: 'user-refresh-secret',
+  refreshSecret: 'refresh-secret',
   refreshExpiresIn: '7d',
-};
-
-const adminConfig = {
-  accessSecret: 'admin-access-secret',
-  accessExpiresIn: '10m',
-  refreshSecret: 'admin-refresh-secret',
-  refreshExpiresIn: '1d',
 };
 
 const hashToken = (token: string) =>
@@ -62,8 +55,7 @@ describe('TokenService', () => {
         TokenService,
         { provide: JwtService, useValue: jwtService },
         { provide: RedisService, useValue: { client: redisClient } },
-        { provide: jwtUserConfig.KEY, useValue: userConfig },
-        { provide: jwtAdminConfig.KEY, useValue: adminConfig },
+        { provide: jwtConfig.KEY, useValue: config },
       ],
     }).compile();
 
@@ -86,12 +78,12 @@ describe('TokenService', () => {
       });
     });
 
-    it('signs the access token with the role-specific secret and expiry', async () => {
+    it('signs the access token with the access secret and expiry', async () => {
       await service.issueTokenPair(payload);
 
       expect(jwtService.sign).toHaveBeenNthCalledWith(1, payload, {
-        secret: userConfig.accessSecret,
-        expiresIn: userConfig.accessExpiresIn,
+        secret: config.accessSecret,
+        expiresIn: config.accessExpiresIn,
       });
     });
 
@@ -105,24 +97,24 @@ describe('TokenService', () => {
         jti: expect.any(String),
       });
       expect(refreshOptions).toEqual({
-        secret: userConfig.refreshSecret,
-        expiresIn: userConfig.refreshExpiresIn,
+        secret: config.refreshSecret,
+        expiresIn: config.refreshExpiresIn,
       });
     });
 
-    it('uses the admin config when role is ADMIN, without cross-contaminating user secrets', async () => {
+    it('signs admin payloads with the same shared secrets', async () => {
       const adminPayload = { ...payload, role: Role.ADMIN };
 
       await service.issueTokenPair(adminPayload);
 
       expect(jwtService.sign).toHaveBeenNthCalledWith(1, adminPayload, {
-        secret: adminConfig.accessSecret,
-        expiresIn: adminConfig.accessExpiresIn,
+        secret: config.accessSecret,
+        expiresIn: config.accessExpiresIn,
       });
       const [, refreshOptions] = jwtService.sign.mock.calls[1];
       expect(refreshOptions).toEqual({
-        secret: adminConfig.refreshSecret,
-        expiresIn: adminConfig.refreshExpiresIn,
+        secret: config.refreshSecret,
+        expiresIn: config.refreshExpiresIn,
       });
     });
 
@@ -135,13 +127,13 @@ describe('TokenService', () => {
 
       const jti = (jwtService.sign.mock.calls[1][0] as { jti: string }).jti;
       expect(redisClient.set).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:user:refresh:${payload.sub}:${jti}`,
+        `${AUTH_REDIS_NAMESPACE}:refresh:${payload.sub}:${jti}`,
         hashToken('refresh-token'),
         'EX',
         900,
       );
       expect(redisClient.sadd).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:user:sessions:${payload.sub}`,
+        `${AUTH_REDIS_NAMESPACE}:sessions:${payload.sub}`,
         jti,
       );
     });
@@ -197,7 +189,7 @@ describe('TokenService', () => {
       });
 
       await expect(
-        service.verifyAndConsumeRefreshToken(refreshToken, Role.USER),
+        service.verifyAndConsumeRefreshToken(refreshToken),
       ).rejects.toThrow(
         new UnauthorizedException(INVALID_REFRESH_TOKEN_MESSAGE),
       );
@@ -210,7 +202,7 @@ describe('TokenService', () => {
       });
 
       await expect(
-        service.verifyAndConsumeRefreshToken(refreshToken, Role.USER),
+        service.verifyAndConsumeRefreshToken(refreshToken),
       ).rejects.toThrow(
         new UnauthorizedException(INVALID_REFRESH_TOKEN_MESSAGE),
       );
@@ -224,11 +216,11 @@ describe('TokenService', () => {
         .mockResolvedValue();
 
       await expect(
-        service.verifyAndConsumeRefreshToken(refreshToken, Role.USER),
+        service.verifyAndConsumeRefreshToken(refreshToken),
       ).rejects.toThrow(
         new UnauthorizedException(REFRESH_TOKEN_REVOKED_MESSAGE),
       );
-      expect(revokeAllSpy).toHaveBeenCalledWith(userId, Role.USER);
+      expect(revokeAllSpy).toHaveBeenCalledWith(userId);
     });
 
     it('revokes all sessions and throws REFRESH_TOKEN_REVOKED_MESSAGE when the stored hash does not match (reuse/theft)', async () => {
@@ -239,11 +231,11 @@ describe('TokenService', () => {
         .mockResolvedValue();
 
       await expect(
-        service.verifyAndConsumeRefreshToken(refreshToken, Role.USER),
+        service.verifyAndConsumeRefreshToken(refreshToken),
       ).rejects.toThrow(
         new UnauthorizedException(REFRESH_TOKEN_REVOKED_MESSAGE),
       );
-      expect(revokeAllSpy).toHaveBeenCalledWith(userId, Role.USER);
+      expect(revokeAllSpy).toHaveBeenCalledWith(userId);
       expect(redisClient.del).not.toHaveBeenCalled();
     });
 
@@ -252,30 +244,27 @@ describe('TokenService', () => {
       redisClient.get.mockResolvedValue(hashToken(refreshToken));
       const revokeAllSpy = jest.spyOn(service, 'revokeAllSessions');
 
-      const result = await service.verifyAndConsumeRefreshToken(
-        refreshToken,
-        Role.USER,
-      );
+      const result = await service.verifyAndConsumeRefreshToken(refreshToken);
 
       expect(result).toEqual({ sub: userId });
       expect(redisClient.del).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:user:refresh:${userId}:${jti}`,
+        `${AUTH_REDIS_NAMESPACE}:refresh:${userId}:${jti}`,
       );
       expect(redisClient.srem).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:user:sessions:${userId}`,
+        `${AUTH_REDIS_NAMESPACE}:sessions:${userId}`,
         jti,
       );
       expect(revokeAllSpy).not.toHaveBeenCalled();
     });
 
-    it('verifies admin refresh tokens against the admin secret, not the user secret', async () => {
+    it('verifies refresh tokens against the shared refresh secret', async () => {
       jwtService.verify.mockReturnValue({ sub: userId, jti });
       redisClient.get.mockResolvedValue(hashToken(refreshToken));
 
-      await service.verifyAndConsumeRefreshToken(refreshToken, Role.ADMIN);
+      await service.verifyAndConsumeRefreshToken(refreshToken);
 
       expect(jwtService.verify).toHaveBeenCalledWith(refreshToken, {
-        secret: adminConfig.refreshSecret,
+        secret: config.refreshSecret,
         ignoreExpiration: false,
       });
     });
@@ -289,10 +278,10 @@ describe('TokenService', () => {
     it('verifies the signature with ignoreExpiration true so expired tokens can still log out', async () => {
       jwtService.verify.mockReturnValue({ sub: userId, jti });
 
-      await service.revokeSession(refreshToken, Role.USER);
+      await service.revokeSession(refreshToken);
 
       expect(jwtService.verify).toHaveBeenCalledWith(refreshToken, {
-        secret: userConfig.refreshSecret,
+        secret: config.refreshSecret,
         ignoreExpiration: true,
       });
     });
@@ -302,9 +291,7 @@ describe('TokenService', () => {
         throw new Error('bad signature');
       });
 
-      await expect(
-        service.revokeSession(refreshToken, Role.USER),
-      ).rejects.toThrow(
+      await expect(service.revokeSession(refreshToken)).rejects.toThrow(
         new UnauthorizedException(INVALID_REFRESH_TOKEN_MESSAGE),
       );
       expect(redisClient.del).not.toHaveBeenCalled();
@@ -313,14 +300,14 @@ describe('TokenService', () => {
     it('deletes the refresh key and removes the jti from the session set without reading the stored hash', async () => {
       jwtService.verify.mockReturnValue({ sub: userId, jti });
 
-      await service.revokeSession(refreshToken, Role.USER);
+      await service.revokeSession(refreshToken);
 
       expect(redisClient.get).not.toHaveBeenCalled();
       expect(redisClient.del).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:user:refresh:${userId}:${jti}`,
+        `${AUTH_REDIS_NAMESPACE}:refresh:${userId}:${jti}`,
       );
       expect(redisClient.srem).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:user:sessions:${userId}`,
+        `${AUTH_REDIS_NAMESPACE}:sessions:${userId}`,
         jti,
       );
     });
@@ -332,38 +319,28 @@ describe('TokenService', () => {
     it('only deletes the sessions key when there are no active sessions', async () => {
       redisClient.smembers.mockResolvedValue([]);
 
-      await service.revokeAllSessions(userId, Role.USER);
+      await service.revokeAllSessions(userId);
 
       expect(redisClient.del).toHaveBeenCalledTimes(1);
       expect(redisClient.del).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:user:sessions:${userId}`,
+        `${AUTH_REDIS_NAMESPACE}:sessions:${userId}`,
       );
     });
 
     it('bulk-deletes every refresh key plus the sessions key when sessions exist', async () => {
       redisClient.smembers.mockResolvedValue(['jti-1', 'jti-2']);
 
-      await service.revokeAllSessions(userId, Role.USER);
+      await service.revokeAllSessions(userId);
 
       expect(redisClient.del).toHaveBeenCalledTimes(2);
       expect(redisClient.del).toHaveBeenNthCalledWith(
         1,
-        `${AUTH_REDIS_NAMESPACE}:user:refresh:${userId}:jti-1`,
-        `${AUTH_REDIS_NAMESPACE}:user:refresh:${userId}:jti-2`,
+        `${AUTH_REDIS_NAMESPACE}:refresh:${userId}:jti-1`,
+        `${AUTH_REDIS_NAMESPACE}:refresh:${userId}:jti-2`,
       );
       expect(redisClient.del).toHaveBeenNthCalledWith(
         2,
-        `${AUTH_REDIS_NAMESPACE}:user:sessions:${userId}`,
-      );
-    });
-
-    it('builds keys scoped to the given role, not other roles', async () => {
-      redisClient.smembers.mockResolvedValue([]);
-
-      await service.revokeAllSessions(userId, Role.ADMIN);
-
-      expect(redisClient.smembers).toHaveBeenCalledWith(
-        `${AUTH_REDIS_NAMESPACE}:admin:sessions:${userId}`,
+        `${AUTH_REDIS_NAMESPACE}:sessions:${userId}`,
       );
     });
   });
