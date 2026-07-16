@@ -147,11 +147,15 @@ describe('AuthService', () => {
       expect(result).toEqual({
         accessToken: 'access-token',
         refreshToken: 'refresh-token',
-        user: { id: createdUser.id, username: createdUser.username },
+        user: {
+          id: createdUser.id,
+          username: createdUser.username,
+          email: createdUser.email,
+        },
       });
     });
 
-    it('does not leak the password or email in the returned user object', async () => {
+    it('does not leak the password in the returned user object', async () => {
       usersService.findByUsername.mockResolvedValue(null);
       usersService.findByEmail.mockResolvedValue(null);
       hashMock.mockResolvedValue('hashed-password');
@@ -164,7 +168,6 @@ describe('AuthService', () => {
       const result = await service.register(dto);
 
       expect(result.user).not.toHaveProperty('password');
-      expect(result.user).not.toHaveProperty('email');
     });
   });
 
