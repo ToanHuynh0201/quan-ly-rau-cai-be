@@ -11,8 +11,6 @@ Tất cả role dùng chung (`/auth`):
 - `POST /auth/refresh` — cấp lại access + refresh token mới (rotate).
 - `POST /auth/logout` — thu hồi refresh token hiện tại (yêu cầu access token hợp lệ).
 
-Route `/admin/auth/*` cũ đã bỏ — admin đăng nhập qua `POST /auth/login`.
-
 ## Cơ chế
 
 - Đăng nhập/đăng ký thành công trả về 1 cặp **access token + refresh token** (JWT), ký bằng secret chung (`src/config/jwt.config.ts`, env `JWT_ACCESS_SECRET`, `JWT_ACCESS_EXPIRES_IN`, `JWT_REFRESH_SECRET`, `JWT_REFRESH_EXPIRES_IN`).
@@ -25,7 +23,7 @@ Route `/admin/auth/*` cũ đã bỏ — admin đăng nhập qua `POST /auth/logi
 
 ## Phân quyền
 
-Trước đây admin/user tách bằng 2 secret khác nhau; giờ dùng chung secret nên phân quyền dựa vào claim `role` trong access token:
+Phân quyền dựa vào claim `role` trong access token:
 
 - `JwtAuthGuard` (`src/modules/auth/guards/jwt-auth.guard.ts`) — xác thực access token (Passport JWT strategy, tên strategy `jwt`).
 - `RolesGuard` + decorator `@Roles(Role.ADMIN)` (`src/modules/auth/guards/roles.guard.ts`, `src/modules/auth/decorators/roles.decorator.ts`) — endpoint cần giới hạn role thì dùng kèm: `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles(...)`.

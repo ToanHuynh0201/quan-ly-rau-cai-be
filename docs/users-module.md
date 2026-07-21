@@ -1,6 +1,6 @@
 # Users Module (shared)
 
-Module truy cập dữ liệu user dùng chung (`src/modules/shared/users`) — thay thế 2 module users trùng lặp cũ của admin và user.
+Module truy cập dữ liệu user dùng chung (`src/modules/shared/users`).
 
 ## Cung cấp
 
