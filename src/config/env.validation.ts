@@ -66,14 +66,6 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
   JWT_REFRESH_EXPIRES_IN: string = '7d';
-
-  @IsString()
-  @IsNotEmpty()
-  ADMIN_SEED_USERNAME!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  ADMIN_SEED_PASSWORD!: string;
 }
 
 export function validate(config: Record<string, unknown>) {
