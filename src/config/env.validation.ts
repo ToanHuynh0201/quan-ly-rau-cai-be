@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
   validateSync,
@@ -47,6 +48,24 @@ export class EnvironmentVariables {
   @Min(0)
   @Max(15)
   REDIS_DB?: number;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_ACCESS_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
+  JWT_ACCESS_EXPIRES_IN: string = '15m';
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_REFRESH_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
+  JWT_REFRESH_EXPIRES_IN: string = '7d';
 }
 
 export function validate(config: Record<string, unknown>) {

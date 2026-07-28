@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -43,3 +43,5 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/quan_ly_rau_cai?schema=public
           REDIS_HOST: localhost
           REDIS_PORT: 6379
+          JWT_ACCESS_SECRET: test-access-secret
+          JWT_REFRESH_SECRET: test-refresh-secret
