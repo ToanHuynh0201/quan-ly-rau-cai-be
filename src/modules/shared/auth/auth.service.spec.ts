@@ -1,10 +1,7 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
-import type { User } from '../../generated/prisma/client';
-import { Role } from '../../generated/prisma/client';
-import { TokenService } from '../shared/token';
-import { UsersService } from '../shared/users';
+
 import {
   EMAIL_ALREADY_REGISTERED_MESSAGE,
   INVALID_CREDENTIALS_MESSAGE,
@@ -13,6 +10,9 @@ import {
   USERNAME_ALREADY_REGISTERED_MESSAGE,
 } from './constants';
 import { AuthService } from './auth.service';
+import { Role, User } from '../../../generated/prisma/client';
+import { TokenService } from '../token';
+import { UsersService } from '../users';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),

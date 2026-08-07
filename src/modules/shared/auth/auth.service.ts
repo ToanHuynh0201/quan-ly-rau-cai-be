@@ -4,8 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { TokenPair, TokenService } from '../shared/token';
-import { UsersService } from '../shared/users';
+
 import {
   EMAIL_ALREADY_REGISTERED_MESSAGE,
   INVALID_CREDENTIALS_MESSAGE,
@@ -15,6 +14,8 @@ import {
 } from './constants';
 import type { LoginDto } from './dto/login.dto';
 import type { RegisterDto } from './dto/register.dto';
+import { UsersService } from '../users';
+import { TokenPair, TokenService } from '../token';
 
 @Injectable()
 export class AuthService {

@@ -12,7 +12,7 @@ import {
   validate,
 } from './config';
 import { CommonModule } from './common/common.module';
-import { AuthModule } from './modules/auth/auth.module';
+import { AuthModule } from './modules/shared/auth/auth.module';
 import { PrismaModule } from './modules/shared/database';
 import { HealthModule } from './modules/shared/health';
 import { RedisModule } from './modules/shared/redis';

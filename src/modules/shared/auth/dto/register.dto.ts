@@ -5,8 +5,8 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Match } from '../../../common/decorators/match.decorator';
 import { PASSWORD_MIN_LENGTH } from '../constants';
+import { Match } from '../../../../common/decorators/match.decorator';
 
 export class RegisterDto {
   @IsString()
