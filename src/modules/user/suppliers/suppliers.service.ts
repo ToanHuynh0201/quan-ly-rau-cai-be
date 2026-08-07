@@ -68,8 +68,6 @@ export class SupplierService {
   }
 
   async update(id: string, dto: UpdateSupplierDto) {
-    await this.findById(id);
-
     try {
       return await this.supplierRepository.update(id, dto);
     } catch (error) {
