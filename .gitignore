@@ -65,6 +65,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .codegraph
 CLAUDE.md
 .claude
+skills-lock.json
+.agents
 
 #IDE/Editor
 .vscode

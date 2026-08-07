@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { Prisma, Supplier } from '@/generated/prisma/client';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { SupplierListItem, supplierListSelect } from './suppliers.type';
 
 @Injectable()
 export class SuppliersRepository {
@@ -24,10 +25,11 @@ export class SuppliersRepository {
     skip?: number;
     take?: number;
     where?: Prisma.SupplierWhereInput;
-  }): Promise<Supplier[]> {
+  }): Promise<SupplierListItem[]> {
     const { skip, take, where } = params;
 
     return this.prisma.supplier.findMany({
+      select: supplierListSelect,
       where,
       skip,
       take,

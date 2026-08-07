@@ -21,9 +21,7 @@ export class SupplierService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException(
-          `Supplier's code "${dto.code}" has existed`,
-        );
+        throw new ConflictException(`Supplier's code ${dto.code} has existed`);
       }
 
       throw error;
@@ -64,8 +62,7 @@ export class SupplierService {
   async findById(id: string) {
     const supplier = await this.supplierRepository.findById(id);
 
-    if (!supplier)
-      throw new NotFoundException(`Supplier with "${id}" not found`);
+    if (!supplier) throw new NotFoundException(`Supplier with ${id} not found`);
 
     return supplier;
   }
@@ -80,15 +77,13 @@ export class SupplierService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException(
-          `Supplier's code "${dto.code}" has existed`,
-        );
+        throw new ConflictException(`Supplier's code ${dto.code} has existed`);
       }
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
-        throw new NotFoundException(`Supplier with "${id}" not found`);
+        throw new NotFoundException(`Supplier with ${id} not found`);
       }
       throw error;
     }
