@@ -12,11 +12,8 @@ import {
   validate,
 } from './config';
 import { CommonModule } from './common/common.module';
-import { AuthModule } from './modules/shared/auth/auth.module';
-import { PrismaModule } from './modules/shared/database';
-import { HealthModule } from './modules/shared/health';
-import { RedisModule } from './modules/shared/redis';
-import { TokenModule } from './modules/shared/token';
+import { UserModule } from './modules/user/user.module';
+import { SharedModule } from './modules/shared/shared.module';
 
 @Module({
   imports: [
@@ -28,11 +25,8 @@ import { TokenModule } from './modules/shared/token';
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     CommonModule,
-    PrismaModule,
-    RedisModule,
-    TokenModule,
-    HealthModule,
-    AuthModule,
+    SharedModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
