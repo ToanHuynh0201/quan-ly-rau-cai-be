@@ -15,7 +15,10 @@ export class UsersRepository {
   }
 
   findById(id: string): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findUnique({
+      where: { id },
+      omit: { password: true },
+    }) as Promise<User | null>;
   }
 
   create(data: {
