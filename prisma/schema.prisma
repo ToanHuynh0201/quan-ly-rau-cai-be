@@ -14,6 +14,17 @@ enum Role {
   ADMIN
 }
 
+enum ProductUnit {
+  KG
+  GRAM
+  BUNCH
+  CARTON
+  BOX
+  BAG
+  PIECE
+  UNIT
+}
+
 model User {
   id        String   @id @default(uuid())
   username  String   @unique
@@ -38,6 +49,8 @@ model Supplier {
   taxCode     String?  
   note        String?  
   isActive    Boolean  @default(true) 
+  
+  products    Product[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -57,9 +70,36 @@ model Category {
   parentId    String?
   parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: SetNull)
   children    Category[] @relation("CategoryToCategory")
+  products    Product[]
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   @@map("categories")
+}
+
+model Product {
+  id            String      @id @default(uuid())
+  code          String      @unique
+  name          String
+  barcode       String?     @unique
+  unit          ProductUnit
+  price         Decimal     @db.Decimal(12, 2)
+  costPrice     Decimal     @db.Decimal(12, 2)
+  stockQuantity Decimal     @default(0) @db.Decimal(12, 3)
+  minStock      Decimal?    @db.Decimal(12, 3)
+  description   String?
+  imageUrl      String?
+  isActive      Boolean     @default(true)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("products")
 }
