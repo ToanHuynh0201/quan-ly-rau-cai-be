@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CategoryRepository } from './category.repository';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { slugify } from './utils/slugify.util';
+import { slugify } from '../../../common/utils/slugify.util';
 import { Prisma } from '@/generated/prisma/client';
 import { QueryCategoryDto } from './dto/query-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
