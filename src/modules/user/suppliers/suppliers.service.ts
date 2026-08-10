@@ -49,7 +49,7 @@ export class SupplierService {
     ]);
 
     return {
-      data,
+      suppliers: data,
       metadata: {
         total,
         page,

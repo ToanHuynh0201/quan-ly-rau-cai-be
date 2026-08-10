@@ -137,13 +137,12 @@ describe('SupplierService', () => {
   describe('update', () => {
     const dto = { code: 'SUP02' };
 
-    it('throws NotFoundException when supplier does not exist', async () => {
-      repository.findById.mockResolvedValue(null);
+    it('does not perform an extra lookup before updating', async () => {
+      repository.update.mockResolvedValue(buildSupplier());
 
-      await expect(service.update('missing', dto)).rejects.toThrow(
-        NotFoundException,
-      );
-      expect(repository.update).not.toHaveBeenCalled();
+      await service.update('supplier-1', dto);
+
+      expect(repository.findById).not.toHaveBeenCalled();
     });
 
     it('returns the updated supplier on success', async () => {

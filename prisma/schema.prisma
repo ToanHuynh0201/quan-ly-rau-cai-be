@@ -43,3 +43,23 @@ model Supplier {
 
   @@map("suppliers")
 }
+
+model Category {
+  id          String     @id @default(uuid())
+  code        String     @unique
+  name        String     
+  slug        String     @unique 
+  description String?    
+  icon        String?    
+  isActive    Boolean    @default(true)
+  
+
+  parentId    String?
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryToCategory")
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("categories")
+}
