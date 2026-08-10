@@ -1,3 +1,4 @@
+import { REGEX } from '@/common/constants';
 import { plainToInstance } from 'class-transformer';
 import {
   IsEnum,
@@ -55,7 +56,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
+  @Matches(REGEX.JWT_TOKEN)
   JWT_ACCESS_EXPIRES_IN: string = '15m';
 
   @IsString()
@@ -64,7 +65,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d+(\.\d+)?(ms|s|m|h|d|w|y)$/i)
+  @Matches(REGEX.JWT_TOKEN)
   JWT_REFRESH_EXPIRES_IN: string = '7d';
 }
 

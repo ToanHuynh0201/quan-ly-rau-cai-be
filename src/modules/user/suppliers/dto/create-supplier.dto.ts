@@ -1,3 +1,4 @@
+import { REGEX } from '@/common/constants';
 import { Transform } from 'class-transformer';
 import {
   IsEmail,
@@ -32,7 +33,7 @@ export class CreateSupplierDto {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[0-9+\-\s]{8,20}$/, {
+  @Matches(REGEX.PHONE_NUMBER, {
     message: 'phone must be a valid phone number',
   })
   phone!: string;
@@ -50,7 +51,7 @@ export class CreateSupplierDto {
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  @Matches(/^\d{10}(\d{3})?$/, { message: 'taxCode must be 10 or 13 digits' })
+  @Matches(REGEX.TAX_CODE, { message: 'taxCode must be 10 or 13 digits' })
   taxCode?: string;
 
   @IsString()

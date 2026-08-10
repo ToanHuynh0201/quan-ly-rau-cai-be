@@ -1,3 +1,4 @@
+import { REGEX } from '@/common/constants';
 import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
@@ -27,7 +28,7 @@ export class CreateCategoryDto {
 
   @IsString()
   @IsOptional()
-  @Matches(/^[a-z0-9]+(-[a-z0-9]+)*$/, {
+  @Matches(REGEX.SLUG, {
     message: 'slug is not kebab-case',
   })
   @Transform(({ value }: { value: unknown }) =>
