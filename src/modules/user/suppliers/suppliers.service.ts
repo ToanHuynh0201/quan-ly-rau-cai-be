@@ -8,6 +8,7 @@ import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { QuerySupplierDto } from './dto/query-supplier.dto';
 import { Prisma } from '@/generated/prisma/client';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { paginationMeta, paginationSkip } from '@/common/utils';
 
 @Injectable()
 export class SupplierService {
@@ -31,7 +32,7 @@ export class SupplierService {
   async findAll(query: QuerySupplierDto) {
     const { page = 1, limit = 10, search } = query;
 
-    const skip = (page - 1) * limit;
+    const skip = paginationSkip(page, limit);
 
     const where: Prisma.SupplierWhereInput = { isActive: true };
 
@@ -50,12 +51,7 @@ export class SupplierService {
 
     return {
       suppliers: data,
-      metadata: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      metadata: paginationMeta(total, page, limit),
     };
   }
 

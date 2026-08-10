@@ -8,9 +8,9 @@ import { CategoryService } from '../category/category.service';
 import { SupplierService } from '../suppliers/suppliers.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Prisma } from '@/generated/prisma/client';
-import { conflictField } from '@/common/utils/conflict.util';
 import { QueryProductDto } from './dto/query-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { conflictField, paginationMeta, paginationSkip } from '@/common/utils';
 
 @Injectable()
 export class ProductService {
@@ -43,7 +43,7 @@ export class ProductService {
   async findAll(query: QueryProductDto) {
     const { page = 1, limit = 10, search, categoryId, supplierId } = query;
 
-    const skip = (page - 1) * limit;
+    const skip = paginationSkip(page, limit);
 
     const where: Prisma.ProductWhereInput = { isActive: true };
 
@@ -64,12 +64,7 @@ export class ProductService {
 
     return {
       products: data,
-      metadata: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      metadata: paginationMeta(total, page, limit),
     };
   }
 

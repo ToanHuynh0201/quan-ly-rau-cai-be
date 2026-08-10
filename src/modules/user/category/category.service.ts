@@ -8,9 +8,9 @@ import { CategoryRepository } from './category.repository';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { slugify } from './utils/slugify.util';
 import { Prisma } from '@/generated/prisma/client';
-import { conflictField } from '../../../common/utils/conflict.util';
 import { QueryCategoryDto } from './dto/query-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { conflictField, paginationMeta, paginationSkip } from '@/common/utils';
 
 @Injectable()
 export class CategoryService {
@@ -45,7 +45,7 @@ export class CategoryService {
   async findAll(query: QueryCategoryDto) {
     const { page = 1, limit = 10, search } = query;
 
-    const skip = (page - 1) * limit;
+    const skip = paginationSkip(page, limit);
 
     const where: Prisma.CategoryWhereInput = { isActive: true };
 
@@ -63,12 +63,7 @@ export class CategoryService {
 
     return {
       categories: data,
-      metadata: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      metadata: paginationMeta(total, page, limit),
     };
   }
 
