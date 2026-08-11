@@ -1,4 +1,7 @@
 import { Prisma } from '@/generated/prisma/client';
+import { PrismaService } from '@/modules/shared/database';
+
+export type Client = PrismaService | Prisma.TransactionClient;
 
 export const productListSelect = {
   id: true,

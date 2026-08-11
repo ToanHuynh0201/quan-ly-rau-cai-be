@@ -2,7 +2,7 @@ import { PrismaService } from '@/modules/shared/database';
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Prisma, Product } from '@/generated/prisma/client';
-import { ProductListItem, productListSelect } from './product.types';
+import { Client, ProductListItem, productListSelect } from './product.types';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
@@ -52,6 +52,17 @@ export class ProductRepository {
     return this.prisma.product.update({
       where: { id },
       data: { isActive: false },
+    });
+  }
+
+  async incrementStock(
+    productId: string,
+    qty: number,
+    client: Client = this.prisma,
+  ): Promise<Product> {
+    return client.product.update({
+      where: { id: productId },
+      data: { stockQuantity: { increment: qty } },
     });
   }
 }

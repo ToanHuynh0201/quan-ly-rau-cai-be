@@ -105,4 +105,12 @@ export class ProductService {
     await this.findById(id);
     return this.productRepository.softDelete(id);
   }
+
+  async incrementStock(
+    productId: string,
+    qty: number,
+    tx: Prisma.TransactionClient,
+  ) {
+    return this.productRepository.incrementStock(productId, qty, tx);
+  }
 }

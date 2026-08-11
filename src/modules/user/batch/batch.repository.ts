@@ -1,4 +1,4 @@
-import { Batch, Prisma } from '@/generated/prisma/client';
+import { Batch, Prisma, StockMovementType } from '@/generated/prisma/client';
 import { PrismaService } from '@/modules/shared/database';
 import { Injectable } from '@nestjs/common';
 import { BatchListItem, batchListSelect, Client } from './batch.types';
@@ -55,10 +55,19 @@ export class BatchRepository {
     batchId: string,
     qty: number,
     client: Client = this.prisma,
-  ): Promise<Batch> {
-    return client.batch.update({
-      where: { id: batchId },
+  ): Promise<boolean> {
+    const { count } = await client.batch.updateMany({
+      where: { id: batchId, remainingQty: { gte: qty } },
       data: { remainingQty: { decrement: qty } },
     });
+
+    return count === 1;
+  }
+
+  async recordMovement(
+    data: { batchId: string; type: StockMovementType; quantity: number },
+    client: Client = this.prisma,
+  ) {
+    return client.stockMovement.create({ data });
   }
 }

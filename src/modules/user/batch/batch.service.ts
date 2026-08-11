@@ -56,27 +56,39 @@ export class BatchService {
   }
 
   async deductStock(productId: string, qty: number, tx: Client) {
-    const batches = await this.batchRepository.findAvailableByProduct(
-      productId,
-      tx,
-    );
-
     let remaining = qty;
-    for (const batch of batches) {
-      if (remaining <= 0) break;
-      const available = Number(batch.remainingQty);
-      const take = Math.min(available, remaining);
 
-      await this.batchRepository.decrementRemaining(batch.id, take, tx);
-      await tx.stockMovement.create({
-        data: {
-          batchId: batch.id,
-          type: StockMovementType.OUT,
-          quantity: take,
-        },
-      });
+    while (remaining > 0) {
+      const batches = await this.batchRepository.findAvailableByProduct(
+        productId,
+        tx,
+      );
 
-      remaining -= take;
+      if (batches.length === 0) break;
+
+      let progressed = false;
+      for (const batch of batches) {
+        if (remaining <= 0) break;
+        const take = Math.min(Number(batch.remainingQty), remaining);
+        if (take <= 0) continue;
+
+        const ok = await this.batchRepository.decrementRemaining(
+          batch.id,
+          take,
+          tx,
+        );
+        if (!ok) continue;
+
+        await this.batchRepository.recordMovement(
+          { batchId: batch.id, type: StockMovementType.OUT, quantity: take },
+          tx,
+        );
+
+        remaining -= take;
+        progressed = true;
+      }
+
+      if (!progressed) break;
     }
 
     if (remaining > 0)
